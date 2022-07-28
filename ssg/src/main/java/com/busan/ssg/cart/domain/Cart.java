@@ -2,6 +2,7 @@ package com.busan.ssg.cart.domain;
 
 import com.busan.ssg.product.domain.Product;
 import com.busan.ssg.user.domain.User;
+import com.busan.ssg.util.BaseTimeEntity;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -14,7 +15,7 @@ import javax.persistence.*;
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
-public class Cart {
+public class Cart extends BaseTimeEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
