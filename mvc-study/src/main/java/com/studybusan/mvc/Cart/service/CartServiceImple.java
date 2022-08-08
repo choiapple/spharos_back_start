@@ -4,7 +4,9 @@ import com.studybusan.mvc.Cart.dto.CartDtoInput;
 import com.studybusan.mvc.Cart.dto.CartDtoOutput;
 import com.studybusan.mvc.Cart.model.Cart;
 import com.studybusan.mvc.Cart.repository.ICartRepository;
+import com.studybusan.mvc.Product.model.Product;
 import com.studybusan.mvc.Product.repository.IProductRepository;
+import com.studybusan.mvc.user.model.User;
 import com.studybusan.mvc.user.repository.IUserRepository;
 import com.studybusan.mvc.user.service.IUserService;
 import lombok.RequiredArgsConstructor;
@@ -12,6 +14,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
@@ -24,13 +27,17 @@ public class CartServiceImple implements ICartService{
 
     @Override
     public Cart addCart(CartDtoInput cartDtoInput){
-        return iCartRepository.save(
-                Cart.builder()
-                        .product(iProductRepository.findById(cartDtoInput.getProductId()).get())
-                        .user(iUserRepository.findById(cartDtoInput.getUserId()).get())
-                        .qty(cartDtoInput.getQty())
-                        .build()
-        );
+        Optional<Product> product = iProductRepository.findById(cartDtoInput.getProductId());
+        Optional<User> user = iUserRepository.findById(cartDtoInput.getUserId());
+        if(product.isPresent() && user.isPresent()){
+            return iCartRepository.save( Cart.builder()
+                            .product(product.get())
+                            .user(user.get())
+                            .qty(cartDtoInput.getQty())
+                            .build()
+            );
+        }
+        return null;
     }
 
     @Override
@@ -52,12 +59,15 @@ public class CartServiceImple implements ICartService{
 
     @Override
     public CartDtoOutput getCartById(Long id){
-        Cart cart = iCartRepository.findById(id).get();
-        return CartDtoOutput.builder()
-                .id(cart.getId())
-                .productName(cart.getProduct().getName())
-                .qty(cart.getQty())
-                .price(cart.getProduct().getPrice())
-                .build();
+        Optional<Cart> cart = iCartRepository.findById(id);
+        if(cart.isPresent()){
+            return CartDtoOutput.builder()
+                    .id(cart.get().getId())
+                    .productName(cart.get().getProduct().getName())
+                    .qty(cart.get().getQty())
+                    .price(cart.get().getProduct().getPrice())
+                    .build();
+            }
+        return null;
     }
 }
